@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
 public class SocialMediaController {
 
     @Autowired
@@ -50,19 +49,19 @@ public class SocialMediaController {
     @GetMapping("/messages/{messageId}")
     public ResponseEntity<Message> getMessageById(@PathVariable Integer messageId) {
         Optional<Message> message = messageService.getMessageById(messageId);
-        return message.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return message.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(200).build());
     }
 
     // #6: Our API should be able to delete a message identified by a message ID.
     @DeleteMapping("/messages/{messageId}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable Integer messageId) {
+    public ResponseEntity<Integer> deleteMessage(@PathVariable Integer messageId) {
         return messageService.deleteMessage(messageId);
     }
 
     // #7: Our API should be able to update a message text identified by a message ID.
     @PatchMapping("/messages/{messageId}")
-    public ResponseEntity<Void> updateMessage(@PathVariable Integer messageId, @RequestBody Message message) {
-        return messageService.updateMessage(messageId, message);
+    public ResponseEntity<Integer> updateMessage(@PathVariable("messageId") Integer messageId, @RequestBody Message updatedMessage) {
+        return messageService.updateMessage(messageId, updatedMessage);
     }
 
     // #8: Our API should be able to retrieve all messages written by a particular user.

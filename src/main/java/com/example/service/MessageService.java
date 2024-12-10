@@ -48,28 +48,33 @@ public class MessageService {
     }
 
     // Delete message by ID
-    public ResponseEntity<Void> deleteMessage(Integer messageId) {
+    public ResponseEntity<Integer> deleteMessage(Integer messageId) {
         if (messageRepository.existsById(messageId)) {
             messageRepository.deleteById(messageId);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(200).body(1);
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(200).build();
     }
 
     // Update message text by ID
-    public ResponseEntity<Void> updateMessage(Integer messageId, Message updatedMessage) {
+    public ResponseEntity<Integer> updateMessage(Integer messageId, Message updatedMessage) {
         Optional<Message> existingMessage = messageRepository.findById(messageId);
         if (existingMessage.isPresent()) {
             Message message = existingMessage.get();
-            message.setMessageText(updatedMessage.getMessageText());
-            if (message.getMessageText().length() > 255 || message.getMessageText().isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    
+            if (updatedMessage.getMessageText().length() > 255 || updatedMessage.getMessageText().isEmpty()) {
+                return ResponseEntity.status(400).body(0); // Invalid messageText
             }
+    
+            message.setMessageText(updatedMessage.getMessageText());
             messageRepository.save(message);
-            return ResponseEntity.ok().build();
+    
+            return ResponseEntity.status(200).body(1); // One row modified
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    
+        return ResponseEntity.status(400).body(0); // No rows updated
     }
+    
 
     // Get all messages for a specific user
     public List<Message> getMessagesByUser(Integer accountId) {
